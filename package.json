@@ -1,0 +1,15 @@
+{
+  "name": "installmanager",
+  "version": "0.1.0",
+  "description": "Install apps/progams on remote pcs",
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "github.com/forsakenharmony/installmanager"
+  },
+  "author": {
+    "name": "harmony",
+    "email": "me@hrmny.pw"
+  },
+  "license": "MIT"
+}
