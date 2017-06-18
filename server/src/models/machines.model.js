@@ -5,8 +5,12 @@ const Sequelize = require('sequelize');
 module.exports = function machinesModel(app) {
   const sequelizeClient = app.get('sequelizeClient');
   const machines        = sequelizeClient.define('machines', {
-    mid: {
-      type     : Sequelize.STRING,
+    name     : {
+      type     : Sequelize.DataTypes.STRING,
+      allowNull: false,
+    },
+    machineid: {
+      type     : Sequelize.DataTypes.STRING,
       allowNull: false,
     },
   });

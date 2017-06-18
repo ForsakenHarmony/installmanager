@@ -1,8 +1,9 @@
 import { Component } from 'preact';
+import { bind } from 'decko';
 
 import { machines } from '../util/feathers';
 
-export default class MachinesView extends Component {
+export default class Machines extends Component {
   state = {
     machines: [],
   };
@@ -15,15 +16,26 @@ export default class MachinesView extends Component {
     this.machines.unsubscribe();
   }
   
+  @bind
+  handleRadio(e) {
+    if (e.target.checked === false) return;
+    this.props.select(e.target.value);
+  }
+  
   render({}, { machines }, {}) {
     return (
-      <ul>
-        <optgroup>
-          {machines.data && machines.data.map(m => (
-            <option value={m.mid} name={m.mid} id={m.mid}>{m.mid}</option>
-          ))}
-        </optgroup>
-      </ul>
+      <div>
+        {machines.data && machines.data.map(e => (
+          <div>
+            <input
+              type="radio"
+              name="machine"
+              value={e.machineid}
+              onChange={this.handleRadio}/>
+            {e.name} - {e.machineid}
+          </div>
+        ))}
+      </div>
     );
   }
 }

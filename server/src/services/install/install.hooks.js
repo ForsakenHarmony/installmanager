@@ -1,32 +1,22 @@
-
 module.exports = {
   before: {
-    all: [],
-    find: [],
-    get: [],
-    create: [],
-    update: [],
-    patch: [],
-    remove: [],
+    all   : [],
+    create: [
+      (hook) => {
+        if (hook.data.machineid === undefined || hook.data.apps === undefined) {
+          throw new Error('Missing machineid or apps');
+        }
+      },
+    ],
   },
-
+  
   after: {
-    all: [],
-    find: [],
-    get: [],
+    all   : [],
     create: [],
-    update: [],
-    patch: [],
-    remove: [],
   },
-
+  
   error: {
-    all: [],
-    find: [],
-    get: [],
+    all   : [],
     create: [],
-    update: [],
-    patch: [],
-    remove: [],
   },
 };

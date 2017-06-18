@@ -1,18 +1,26 @@
 import { Component } from 'preact';
+import { bind } from 'decko';
 
 import Mach from './components/machines';
 import Inst from './components/install';
 
 export default class App extends Component {
-  select() {
+  state = {
+    selected: '',
+  };
   
+  @bind
+  select(selected) {
+    this.setState({ selected });
   }
   
-  render({}, {}, {}) {
+  render({}, { selected }, {}) {
     return (
       <div>
+        <hr/>
         <Mach select={this.select}/>
-        <Inst selected="fff"/>
+        <hr/>
+        <Inst selected={selected}/>
       </div>
     );
   }

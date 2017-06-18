@@ -4,10 +4,6 @@ class Service {
     this.options = options || {};
   }
   
-  find(params) {
-    return Promise.resolve([]);
-  }
-  
   create(data, params) {
     if (Array.isArray(data)) {
       return Promise.all(data.map(current => this.create(current)));

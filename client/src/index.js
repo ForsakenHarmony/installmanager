@@ -1,4 +1,4 @@
-import { render, Component } from 'preact';
+import { render } from 'preact';
 
 import App from './app';
 

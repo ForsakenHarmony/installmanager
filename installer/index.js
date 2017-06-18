@@ -2,16 +2,21 @@ const feathers = require('feathers/client');
 const socketio = require('feathers-socketio/client');
 const io       = require('socket.io-client');
 const randomID = require('random-id');
+const os       = require('os');
+const fs       = require('fs');
 
 const download = require('./src/download');
 const spawn    = require('./src/spawn');
 
-const fs = require('fs');
-
 const config = require('./config.json');
 const host   = 'http://' + config.host + ':' + config.port;
 
-const id = randomID(10);
+if (os.platform() !== 'win32') {
+  console.error('This currently only supports windows!');
+  process.exit(1);
+}
+
+const id = randomID(20);
 console.log('ID', id);
 
 process.stdin.resume();
@@ -22,37 +27,72 @@ const app = feathers()
   .configure(socketio(socket));
 
 const machines = app.service('machines');
-machines.create({ mid: id });
+
+let mid = -1;
+machines
+  .create({ name: os.hostname(), machineid: id })
+  .then(({ id }) => {
+    mid = id;
+  });
 
 const install = app.service('install');
 
-install.on('created', async (data, params) => {
-  if (data.machineid !== id) return;
-  console.log('created', data, params);
-  await download(host, data.path);
-  await new Promise(res => setTimeout(res, 100));
+const downloadQueue = [];
+const installQueue  = [];
+
+let isDownloading = false;
+let isInstalling  = false;
+
+const installApp = async (data) => {
   await spawn('dl/' + data.path, data.args);
   await new Promise(res => setTimeout(res, 100));
-  require('fs').unlinkSync('dl/' + data.path);
+  fs.unlinkSync('dl/' + data.path);
   console.log('deleted', data.path);
+};
+
+const downloadApp = async (data) => {
+  await download(data.file.local ? host + data.file.path : data.file.path);
+  await new Promise(res => setTimeout(res, 100));
+  installQueue.push(data);
+  if (!isInstalling) {
+    isInstalling = true;
+    installApp(installQueue.shift());
+  }
+  if (downloadQueue.length > 0) {
+    downloadApp(downloadQueue.shift());
+  } else {
+    isDownloading = false;
+  }
+};
+
+const apps = app.service('apps');
+
+install.on('created', async (data) => {
+  if (data.machineid !== id) return;
+  console.log('created', data);
+  const appsToInstall = await apps.find({
+    query: {
+      $or: data.apps.map(id => ({ id: parseInt(id, 10) })),
+    },
+  });
+  appsToInstall.data.map((d) => {
+    d.args = JSON.parse(d.args);
+    return d;
+  });
+  downloadQueue.push(...appsToInstall.data);
+  if (!isDownloading) {
+    isDownloading = true;
+    downloadApp(downloadQueue.shift());
+  }
 });
 
-socket.on('connect', () => {
-  console.log('connected');
-});
-
-socket.on('event', (data) => {
-  console.log(data);
-});
-
-socket.on('disconnect', () => {
-  console.log('disconnected');
-});
+socket.on('connect', () => console.log('connected'));
+socket.on('disconnect', () => console.log('disconnected'));
 
 function exit(options, err) {
   if (options.cleanup) {
     console.log('clean');
-    machines.remove(null, { query: { mid: id } });
+    machines.remove(mid);
   }
   if (err) console.log(err.stack);
   if (options.exit) process.exit();

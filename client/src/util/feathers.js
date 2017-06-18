@@ -17,3 +17,5 @@ export default app;
 export const install  = app.service('install');
 export const machines = app.service('machines');
 export const apps     = app.service('apps');
+export const files     = app.service('files');
+export const uploads     = app.service('uploads');
