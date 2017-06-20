@@ -2,6 +2,8 @@ const request     = require('request');
 const ProgressBar = require('progress');
 const fs          = require('fs');
 
+const debug = require('debug')('installapp:download');
+
 const makeRequest = (path, filename) => {
   return new Promise((resolve, reject) => {
     const req = request.get(path);
@@ -10,12 +12,12 @@ const makeRequest = (path, filename) => {
       flags: 'a',
     });
     
-    console.log('to download:', path);
+    debug('to download:', path);
     
     req.on('response', (res) => {
       const len = parseInt(res.headers['content-length'], 10);
       
-      const bar = new ProgressBar('downloading ' + filename + ' [:bar] :rate/bps :percent :etas', {
+      const bar = new ProgressBar('installapp:download ' + filename + ' [:bar] :rate/bps :percent :etas', {
         complete  : '=',
         incomplete: ' ',
         width     : 50,

@@ -50,7 +50,8 @@ export default class AddApp extends Component {
     e.preventDefault();
     const path = this.file.value;
     const name = path.split('/');
-    await files.create({ path, filename: name[name.length - 1], local: false });
+    const result = await files.create({ path, filename: name[name.length - 1], local: false });
+    this.setState({ fileId: result.id });
   }
   
   @bind
@@ -58,9 +59,9 @@ export default class AddApp extends Component {
     e.preventDefault();
     const { fileId, name } = this.state;
     
-    const args = '[' + this.state.args.split(' ').toString() + ']';
+    const args = JSON.stringify(this.state.args.split(" "));
     await apps.create({ fileId, name, args });
-    this.props.close();
+    this.props.close(); 
   }
   
   @bind

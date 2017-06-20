@@ -18,7 +18,7 @@ export default class App extends Component {
     return (
       <div>
         <hr/>
-        <Mach select={this.select}/>
+        {/*<Mach select={this.select}/>*/}
         <hr/>
         <Inst selected={selected}/>
       </div>

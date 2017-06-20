@@ -9,16 +9,17 @@ module.exports = function machinesModel(app) {
       type     : Sequelize.DataTypes.STRING,
       allowNull: false,
     },
-    machineid: {
+    id: {
       type     : Sequelize.DataTypes.STRING,
+      primaryKey: true,
       allowNull: false,
     },
   });
-  
+
   machines.associate = function associate(models) { // eslint-disable-line no-unused-vars
     // Define associations here
     // See http://docs.sequelizejs.com/en/latest/docs/associations/
   };
-  
+
   return machines;
 };

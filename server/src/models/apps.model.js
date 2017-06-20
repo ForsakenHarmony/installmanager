@@ -13,10 +13,10 @@ module.exports = function appsModel(app) {
       default  : '[]',
     },
   });
-  
+
   apps.associate = function associate(models) { // eslint-disable-line no-unused-vars
-    models.files.hasOne(models.apps, { allowNull: false });
+    models.files.hasOne(models.apps, { foreignKey: { allowNull: false }, onDelete: 'CASCADE' });
   };
-  
+
   return apps;
 };

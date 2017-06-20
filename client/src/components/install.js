@@ -1,24 +1,27 @@
 import { Component } from 'preact';
 import { bind } from 'decko';
 
-import { install, apps } from '../util/feathers';
+import { install, apps, machines } from '../util/feathers';
 
 import AddApp from './add-app';
 
 export default class Install extends Component {
   state = {
     apps : [],
+    machines: [],
     error: null,
     flash: false,
     add  : false,
   };
   
   componentDidMount() {
-    this.apps = apps.find().subscribe(apps => this.setState({ apps }));
+    this.apps = apps.find().subscribe(apps => this.setState({ apps: apps.data }));
+    this.machines = machines.find().subscribe(machines => this.setState({ machines: machines.data }));
   }
   
   componentWillUnmount() {
     this.apps.unsubscribe();
+    this.machines.unsubscribe();
   }
   
   @bind
@@ -55,6 +58,10 @@ export default class Install extends Component {
   render({ selected }, { apps, error, flash, add }, {}) {
     return (
       <div>
+        <div>
+          <p>machines: {machines.toString()}</p>
+          <p>apps: {apps.toString()}</p>
+        </div>
         <form onSubmit={this.installApps}>
           <h3>Selected: {selected}</h3>
           <input type="hidden" name="target" value={selected}/>
