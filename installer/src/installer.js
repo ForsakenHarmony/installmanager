@@ -1,3 +1,11 @@
+const fs = require('fs');
+const debug = require('debug')('installapp:installer');
+
+const download = require('./download');
+const spawn    = require('./spawn');
+
+const host = require('./config').host;
+
 const downloadQueue = [];
 const installQueue  = [];
 
@@ -7,8 +15,8 @@ let isInstalling  = false;
 const installApp = async (data) => {
   try {
     await spawn('dl/' + data.file.filename, data.args);
-  }catch (e) {
-    debug(null, 'Error while installing', e)
+  } catch (e) {
+    debug(null, 'Error while installing', e);
   }
   await new Promise(res => setTimeout(res, 100));
   fs.unlinkSync('dl/' + data.file.filename);
@@ -35,10 +43,10 @@ const downloadApp = async (data) => {
   }
 };
 
-module.exports = (app) => {
-  const apps = app.service('apps');
+module.exports = (app, mid) => {
+  const apps    = app.service('apps');
   const install = app.service('install');
-
+  
   install.on('created', async (data) => {
     if (data.machineid !== mid) return;
     console.log('created', data);

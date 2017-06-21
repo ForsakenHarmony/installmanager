@@ -1,16 +1,14 @@
-const feathers    = require('feathers/client');
-const socketio    = require('feathers-socketio/client');
-const io          = require('socket.io-client');
-const os          = require('os');
-const fs          = require('fs');
-const {machineIdSync} = require('node-machine-id');
+const feathers          = require('feathers/client');
+const socketio          = require('feathers-socketio/client');
+const io                = require('socket.io-client');
+const os                = require('os');
+const { machineIdSync } = require('node-machine-id');
 
 require('debug').enable('*');
 const debug = require('debug')('installapp:main');
 
-const download = require('./src/download');
-const spawn    = require('./src/spawn');
-const config = require('./config.json');
+const installer = require('./src/installer');
+const config    = require('./src/config');
 
 if (os.platform() !== 'win32') {
   debug('This currently only supports windows!');
@@ -18,19 +16,20 @@ if (os.platform() !== 'win32') {
 }
 
 const mid = machineIdSync();
-console.log('ID', id);
+console.log('ID', mid);
 
 process.stdin.resume();
 
-const host   = 'http://' + config.host + ':' + config.port;
+const host   = config.host;
+
 const socket = io(host);
-const app = feathers()
+const app    = feathers()
   .configure(socketio(socket));
 
 const machines = app.service('machines');
-machines.create({ name: os.hostname(), mid: id });
+machines.create({ name: os.hostname(), id: mid });
 
-const install = app.service('install');
+installer(app, mid);
 
 socket.on('connect', () => console.log('connected'));
 socket.on('disconnect', () => console.log('disconnected'));
